@@ -31,42 +31,42 @@
     "id_producto": "CO001",
     "categoria": "Consolas",
     "nombre": "PlayStation 5",
-    "descripcion": "",
+    "descripcion": "La consola de última generación de Sony, que ofrece gráficos impresionantes y tiempos de carga ultrarrápidos para una experiencia de juego inmersiva.",
     "precio": "$549.990 CLP"
   },
   {
     "id_producto": "CG001",
     "categoria": "Computadores Gamers",
     "nombre": "PC Gamer ASUS ROG Strix",
-    "descripcion": "",
+    "descripcion": "Un potente equipo diseñado para los gamers más exigentes, equipado con los últimos componentes para ofrecer un rendimiento excepcional en cualquier juego.",
     "precio": "$1.299.990 CLP"
   },
   {
     "id_producto": "SG001",
     "categoria": "Sillas Gamers",
     "nombre": "Silla Gamer Secretlab Titan",
-    "descripcion": "",
+    "descripcion": "Diseñada para el máximo confort, esta silla ofrece un soporte ergonómico y personalización ajustable para sesiones de juego prolongadas.",
     "precio": "$349.990 CLP"
   },
   {
     "id_producto": "MS001",
     "categoria": "Mouse",
     "nombre": "Mouse Gamer Logitech G502 HERO",
-    "descripcion": "",
+    "descripcion": "Con sensor de alta precisión y botones personalizables, este mouse es ideal para gamers que buscan un control preciso y personalización.",
     "precio": "$49.990 CLP"
   },
   {
     "id_producto": "MP001",
     "categoria": "Mousepad",
     "nombre": "Mousepad Razer Goliathus Extended Chroma",
-    "descripcion": "",
+    "descripcion": "Ofrece un área de juego amplia con iluminación RGB personalizable, asegurando una superficie suave y uniforme para el movimiento del mouse.",
     "precio": "$29.990 CLP"
   },
   {
     "id_producto": "PP001",
     "categoria": "Poleras Personalizadas",
     "nombre": "Polera Gamer Personalizada 'Level-Up'",
-    "descripcion": "",
-    "precio": "$14.990 CLP"
+    "descripcion": "Una camiseta cómoda y estilizada, con la posibilidad de personalizarla con tu gamer tag o diseño favorito.",
+    "precio": "$14.990 CL."
   }
 ]
