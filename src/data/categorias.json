@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "titulo": "Juegos de Mesa",
+    "imagen": "../assets/imgs/productos/Catan/w=1500,h=1500,fit=pad_catan.webp",
+    "link": "#"
+  },
+  {
+    "id": 2,
+    "titulo": "Accesorios",
+    "imagen": "../assets/imgs/productos/Auriculares/w=1500,h=1500,fit=pad.webp",
+    "link": "#"
+  },
+  {
+    "id": 3,
+    "titulo": "Consolas",
+    "imagen": "../assets/imgs/productos/PlayStation%205/w=1500,h=1500,fit=pad.webp",
+    "link": "#"
+  },
+  {
+    "id": 4,
+    "titulo": "Computadores",
+    "imagen": "../assets/imgs/productos/PC%20Gamer/w=1500,h=1500,fit=pad_pc.webp",
+    "link": "#"
+  },
+  {
+    "id": 5,
+    "titulo": "Sillas Gamers",
+    "imagen": "../assets/imgs/productos/Silla/51z99dkOVHL._AC_SL1000__square.png",
+    "link": "#"
+  },
+  {
+    "id": 6,
+    "titulo": "Mouse",
+    "imagen": "../assets/imgs/productos/Mouse/51PNyeVCKZL._AC_SL1500__square.png",
+    "link": "#"
+  },
+  {
+    "id": 7,
+    "titulo": "Mousepads",
+    "imagen": "../assets/imgs/productos/MousePad/D_NQ_NP_711289-MLU70103676213_062023-O_square.png",
+    "link": "#"
+  },
+  {
+    "id": 8,
+    "titulo": "Poleras y Polerones",
+    "imagen": "../assets/imgs/productos/Polera/polera_azul.png",
+    "link": "#"
+  }
+]

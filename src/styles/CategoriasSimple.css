@@ -1,0 +1,76 @@
+/* Sección general */
+.categorias-simple-section {
+  padding: 2rem 0;
+  background: #000; /* Fondo negro para toda la sección */
+  color: #fff; /* Texto blanco por defecto */
+}
+
+/* Contenedor centrado y ancho máximo */
+.categorias-simple-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Título */
+.categorias-simple-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff; /* Título en blanco */
+}
+
+/* Grid de tarjetas */
+.categorias-simple-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+/* Tarjeta */
+.categoria-simple-card {
+  display: block;
+  text-decoration: none;
+  color: #fff; /* Letras blancas en la tarjeta */
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000; /* Fondo negro en la tarjeta */
+  border: 2px solid #39ff14; /* Borde verde neón */
+  box-shadow: 0 6px 18px rgba(57, 255, 20, 0.15); /* Sombra con tinte verde */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.categoria-simple-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 24px rgba(57, 255, 20, 0.5), 0 10px 24px rgba(57, 255, 20, 0.35); /* Glow verde neón */
+}
+
+/* Imagen */
+.categoria-simple-image-container {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: #0a0a0a; /* Fondo oscuro detrás de la imagen */
+}
+
+.categoria-simple-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Contenido */
+.categoria-simple-content {
+  padding: 1rem;
+  text-align: center;
+  background: transparent; /* Sin fondo para mantener el negro */
+}
+
+.categoria-simple-titulo {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff; /* Texto del título en blanco */
+}

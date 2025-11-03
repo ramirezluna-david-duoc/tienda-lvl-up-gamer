@@ -1,6 +1,6 @@
 import React from 'react';
 import '../styles/Hero.css';
-import logoEmpresa from "./"
+import logoEmpresa from "../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png"
 
 const Hero: React.FC = () => {
   return (
@@ -17,7 +17,7 @@ const Hero: React.FC = () => {
         </div>
         <div className="hero-image">
           <img 
-            src="../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png" 
+            src={logoEmpresa}
             alt="Gaming Setup" 
             className="hero-img"
           />
