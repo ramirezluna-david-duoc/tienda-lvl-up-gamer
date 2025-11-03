@@ -1,13 +1,7 @@
 import React from 'react';
 import categoriasData from '../data/categorias.json';
 import '../styles/CategoriasSimple.css';
-
-interface Categoria {
-  id: number;
-  titulo: string;
-  imagen?: string;
-  link: string;
-}
+import { Categoria } from '../types/Categoria';
 
 // Mapa de imágenes locales confiables por título
 const imageMap: Record<string, string> = {

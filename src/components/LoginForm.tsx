@@ -1,7 +1,8 @@
 import React, { FormEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/LoginForm.css';
 import logoEmpresa from '../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png';
+import { useAuth } from '../context/AuthContext';
 
 const allowedDomains = ['@duoc.cl', '@profesor.duoc.cl', '@gmail.com'];
 
@@ -11,6 +12,8 @@ const LoginForm: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [generalError, setGeneralError] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const validateEmail = (value: string): boolean => {
     const normalized = value.trim().toLowerCase();
@@ -50,7 +53,15 @@ const LoginForm: React.FC = () => {
       return;
     }
 
-    console.log('Formulario válido:', { email: trimmedEmail, password: trimmedPassword });
+    // Intentar iniciar sesión
+    const loginSuccessful = login(trimmedEmail, trimmedPassword);
+    
+    if (loginSuccessful) {
+      // Redirigir a la página principal
+      navigate('/');
+    } else {
+      setGeneralError('Credenciales incorrectas. Intenta con: user@duoc.cl / user123');
+    }
   };
 
   return (
