@@ -1,0 +1,48 @@
+.login-section {
+  min-height: 100vh;
+}
+
+.login-card {
+  background-color: #101013;
+}
+
+.login-logo {
+  width: 90px;
+  height: 84px;
+  object-fit: contain;
+}
+
+.login-card .form-control {
+  color: #f8f9fa;
+}
+
+.login-card .form-control::placeholder {
+  color: rgba(248, 249, 250, 0.7);
+}
+
+.login-card .form-text {
+  color: #adb5bd !important;
+}
+
+.btn-custom-verde {
+  background-color: #39ff14;
+  border-color: #39ff14;
+  color: #0a0a0a;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-custom-verde:hover,
+.btn-custom-verde:focus {
+  background-color: #32e012;
+  border-color: #32e012;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(50, 224, 18, 0.6);
+}
+
+.btn-custom-verde:active {
+  transform: translateY(0);
+  box-shadow: none;
+}

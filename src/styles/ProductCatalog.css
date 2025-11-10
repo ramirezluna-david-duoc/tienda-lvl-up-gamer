@@ -1,0 +1,107 @@
+.catalog-hero {
+  min-height: 260px;
+  background: linear-gradient(180deg, rgba(5, 5, 18, 0.8) 0%, rgba(5, 5, 18, 0.95) 100%),
+    url('../assets/imgs/bg/nerfee-mirandilla-2mBKkeklHbI-unsplash.jpg') center/cover no-repeat;
+  padding: 4rem 0;
+}
+
+.catalog-hero .text-shadow {
+  text-shadow: 0 0 18px rgba(0, 217, 255, 0.35);
+}
+
+.catalog-section {
+  background-color: #04040a;
+}
+
+.filter-card {
+  background-color: #0c0c13 !important;
+  border-color: #0d6efd !important;
+}
+
+.filter-card .form-control,
+.filter-card .form-select {
+  background-color: #11111a;
+  border-color: #2f2f3a;
+  color: #f8f9fa;
+}
+
+.filter-card .form-control:focus,
+.filter-card .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.filter-card .input-group-text {
+  border-color: #2f2f3a;
+}
+
+.product-card {
+  background-color: #101017;
+  border-color: #39ff14 !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(57, 255, 20, 0.2);
+}
+
+.product-image-wrapper {
+  background: radial-gradient(circle at top, rgba(57, 255, 20, 0.12), rgba(16, 16, 23, 0.6));
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.product-image-wrapper img {
+  object-fit: contain;
+}
+
+.product-card .card-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  letter-spacing: 0.08em;
+}
+
+.product-price {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  border-radius: 0.5rem;
+}
+
+.catalog-empty-state {
+  background-color: #101017;
+  border-color: #39ff14 !important;
+  border-style: dashed !important;
+  color: #adb5bd;
+}
+
+.btn-custom-verde {
+  background-color: #39ff14;
+  border-color: #39ff14;
+  color: #0a0a0a;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-custom-verde:hover,
+.btn-custom-verde:focus {
+  background-color: #32e012;
+  border-color: #32e012;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(50, 224, 18, 0.6);
+}
+
+.btn-custom-verde:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+@media (max-width: 767.98px) {
+  .catalog-hero {
+    padding: 3rem 0;
+  }
+
+  .catalog-hero h1 {
+    font-size: 2.25rem;
+  }
+}

@@ -1,0 +1,58 @@
+.register-section {
+  min-height: 100vh;
+}
+
+.register-card {
+  background-color: #101013;
+}
+
+.register-logo {
+  width: 100px;
+  height: 94px;
+  object-fit: contain;
+}
+
+.register-card .form-control,
+.register-card .form-select {
+  color: #f8f9fa;
+}
+
+.register-card .form-control::placeholder,
+.register-card .form-select::placeholder {
+  color: rgba(248, 249, 250, 0.7);
+}
+
+.register-card .form-text {
+  color: #adb5bd !important;
+}
+
+.register-card .form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.register-card .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-custom-verde {
+  background-color: #39ff14;
+  border-color: #39ff14;
+  color: #0a0a0a;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-custom-verde:hover,
+.btn-custom-verde:focus {
+  background-color: #32e012;
+  border-color: #32e012;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(50, 224, 18, 0.6);
+}
+
+.btn-custom-verde:active {
+  transform: translateY(0);
+  box-shadow: none;
+}

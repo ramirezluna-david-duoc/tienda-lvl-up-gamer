@@ -1,0 +1,82 @@
+/* Estilos para el carrito de compras */
+
+.text-shadow {
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Botón verde personalizado */
+.btn-custom-verde {
+  background: linear-gradient(135deg, #15a34a, #0f5132);
+  color: #fff;
+  border: 1px solid #198754;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-custom-verde:hover {
+  background: linear-gradient(135deg, #198754, #0a3622);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 163, 74, 0.4);
+  color: #fff;
+}
+
+.btn-custom-verde:active {
+  transform: translateY(0);
+}
+
+/* Tabla del carrito */
+.table-dark.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #1a1a1a;
+}
+
+.table-dark tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+/* Badge del carrito */
+.badge.bg-danger {
+  font-size: 0.7rem;
+  padding: 0.25em 0.5em;
+  box-shadow: 0 0 0 2px #000;
+}
+
+/* Tarjeta de resumen mejorada */
+.cart-summary-card {
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3) !important;
+}
+
+.cart-summary-card .card-body {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.cart-summary-card .bg-success.bg-opacity-10 {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+  border: 1px solid rgba(25, 135, 84, 0.2);
+}
+
+/* Animación al agregar al carrito */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn-custom-verde:active {
+  animation: pulse 0.3s ease;
+}
+
+/* Mejoras visuales */
+.card.border-primary {
+  box-shadow: 0 4px 16px rgba(13, 110, 253, 0.2);
+}
+
+.btn-outline-light:hover {
+  background-color: #f8f9fa;
+  color: #000;
+}
