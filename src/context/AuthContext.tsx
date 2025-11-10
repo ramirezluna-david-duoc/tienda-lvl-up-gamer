@@ -22,7 +22,6 @@ const VALID_CREDENTIALS = {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
-    // Verificar si hay un usuario guardado en localStorage
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
@@ -31,7 +30,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
 
-    // Validar credenciales
     if (
       trimmedEmail === VALID_CREDENTIALS.email.toLowerCase() &&
       trimmedPassword === VALID_CREDENTIALS.password

@@ -1,9 +1,11 @@
 import React, { ChangeEvent, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import productosData from '../data/producto.json';
 import '../styles/ProductCatalog.css';
 import { BsCart4, BsFunnelFill, BsSearch } from 'react-icons/bs';
 import { Producto } from '../types/Producto';
 import { CatalogProduct } from '../types/CatalogProduct';
+import { useCart } from '../context/CartContext';
 
 const rawProducts = productosData as Producto[];
 
@@ -45,6 +47,7 @@ const CartIcon = BsCart4 as unknown as SvgIconComponent;
 const ProductCatalog: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES);
+  const { addItem } = useCart();
 
   const categoryOptions = useMemo(() => {
     const unique = Array.from(new Set(catalogProducts.map((product) => product.categoryLabel)));
@@ -83,10 +86,11 @@ const ProductCatalog: React.FC = () => {
   };
 
   const handleAddToCart = (product: CatalogProduct) => {
-    console.log('Agregar al carrito (simulación):', {
+    addItem({
       id: product.id_producto,
       nombre: product.nombre,
-      precio: product.price
+      precio: product.price,
+      imagen: product.image
     });
   };
 
@@ -168,10 +172,14 @@ const ProductCatalog: React.FC = () => {
                           {product.categoryLabel}
                         </div>
                         <div className="card-body d-flex flex-column">
-                          <div className="ratio ratio-1x1 mb-3 product-image-wrapper">
-                            <img src={product.image} alt={product.nombre} className="img-fluid" />
-                          </div>
-                          <h5 className="card-title text-white mb-2">{product.nombre}</h5>
+                          <Link to={`/producto/${product.id_producto}`} className="text-decoration-none">
+                            <div className="ratio ratio-1x1 mb-3 product-image-wrapper">
+                              <img src={product.image} alt={product.nombre} className="img-fluid" />
+                            </div>
+                          </Link>
+                          <Link to={`/producto/${product.id_producto}`} className="text-decoration-none">
+                            <h5 className="card-title text-white mb-2">{product.nombre}</h5>
+                          </Link>
                           <p className="card-text text-secondary small flex-grow-1">
                             {product.descripcion}
                           </p>

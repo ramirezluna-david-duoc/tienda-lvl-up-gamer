@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import '../styles/Navbar.css';
 import logoEmpresa from "../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png"
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
+  const { totalItems } = useCart();
 
   const handleLogout = () => {
     logout();
@@ -34,9 +36,14 @@ const Navbar: React.FC = () => {
                   <i className="bi bi-person-circle me-2"></i>
                   Perfil
                 </Link>
-                <Link to="/carrito" className="btn btn-outline-light text-white">
+                <Link to="/carrito" className="btn btn-outline-light text-white position-relative">
                   <i className="bi bi-cart3 me-2"></i>
                   Carrito
+                  {totalItems > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      {totalItems}
+                    </span>
+                  )}
                 </Link>
                 <button onClick={handleLogout} className="btn btn-danger text-white">
                   <i className="bi bi-box-arrow-right me-2"></i>
