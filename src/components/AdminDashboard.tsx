@@ -66,7 +66,7 @@ const AdminDashboard: React.FC = () => {
         </li>
         <li>
           <Link
-            to="/logout"
+            to="/"
             className="text-white text-decoration-none d-block py-2"
           >
             Cerrar Sesión
