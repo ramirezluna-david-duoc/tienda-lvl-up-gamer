@@ -54,13 +54,17 @@ const LoginForm: React.FC = () => {
     }
 
     // Intentar iniciar sesión
-    const loginSuccessful = login(trimmedEmail, trimmedPassword);
+    const loginResult = login(trimmedEmail, trimmedPassword);
     
-    if (loginSuccessful) {
-      // Redirigir a la página principal
-      navigate('/');
+    if (loginResult.success) {
+      // Redirigir según el rol del usuario
+      if (loginResult.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } else {
-      setGeneralError('Credenciales incorrectas. Intenta con: user@duoc.cl / user123');
+      setGeneralError('Credenciales incorrectas. Intenta con: user@duoc.cl / user123 o admin@duoc.cl / admin123');
     }
   };
 

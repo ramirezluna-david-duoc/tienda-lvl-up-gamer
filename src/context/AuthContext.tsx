@@ -3,11 +3,12 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface User {
   email: string;
   nombre?: string;
+  role: 'admin' | 'user';
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => { success: boolean; role?: 'admin' | 'user' };
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -15,10 +16,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Credenciales predefinidas
-const VALID_CREDENTIALS = {
-  email: 'user@duoc.cl',
-  password: 'user123'
-};
+const VALID_CREDENTIALS = [
+  {
+    email: 'admin@duoc.cl',
+    password: 'admin123',
+    role: 'admin' as const,
+    nombre: 'Administrador'
+  },
+  {
+    email: 'user@duoc.cl',
+    password: 'user123',
+    role: 'user' as const,
+    nombre: 'Usuario'
+  }
+];
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -26,23 +37,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = (email: string, password: string): boolean => {
+  const login = (email: string, password: string): { success: boolean; role?: 'admin' | 'user' } => {
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
 
-    if (
-      trimmedEmail === VALID_CREDENTIALS.email.toLowerCase() &&
-      trimmedPassword === VALID_CREDENTIALS.password
-    ) {
+    const validUser = VALID_CREDENTIALS.find(
+      (cred) => cred.email.toLowerCase() === trimmedEmail && cred.password === trimmedPassword
+    );
+
+    if (validUser) {
       const userData: User = {
         email: trimmedEmail,
-        nombre: 'Administrador'
+        nombre: validUser.nombre,
+        role: validUser.role
       };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
-      return true;
+      return { success: true, role: validUser.role };
     }
-    return false;
+    return { success: false };
   };
 
   const logout = () => {
