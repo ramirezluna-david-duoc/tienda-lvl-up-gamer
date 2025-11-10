@@ -12,6 +12,13 @@ import CartPage from './pages/CartPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import Layout from "./components/Layout";
+import AdminProductos from "./pages/AdminProductos";
+import { Productos } from "./pages/Producto";
+import AdminHome from "./pages/AdminHome";
+import NuevoProducto from "./pages/NuevoProducto";
+import AdminUsuarios from "./pages/AdminUsuarios";
+import NuevoUsuario from "./pages/NuevoUsuario";
 
 const HomePage: React.FC = () => (
   <>
@@ -27,12 +34,23 @@ const App: React.FC = () => (
     <CartProvider>
       <Router>
         <Routes>
+          {/* Rutas públicas */}
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/catalogo" element={<ProductCatalogPage />} />
           <Route path="/carrito" element={<CartPage />} />
           <Route path="/producto/:id" element={<ProductDetailPage />} />
+          
+          {/* Rutas de administración */}
+          <Route element={<Layout />}>
+            <Route path="/admin" element={<AdminHome />} />
+            <Route path="/productos" element={<AdminProductos />} />
+            <Route path="/nuevo-producto" element={<NuevoProducto />} />
+            <Route path="/producto" element={<Productos />} />
+            <Route path="/usuarios" element={<AdminUsuarios />} />
+            <Route path="/nuevo-usuario" element={<NuevoUsuario />} />
+          </Route>
         </Routes>
       </Router>
     </CartProvider>
