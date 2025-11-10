@@ -5,6 +5,9 @@ import Layout from "./components/Layout";
 import AdminProductos from "./pages/AdminProductos";
 import { Productos } from "./pages/Producto";
 import AdminHome from "./pages/AdminHome";
+import NuevoProducto from "./pages/NuevoProducto";
+import AdminUsuarios from "./pages/AdminUsuarios";
+import NuevoUsuario from "./pages/NuevoUsuario";
 
 /*
 function App() {
@@ -29,8 +32,10 @@ function App() {
         <Route element={<Layout />}>
           <Route path="admin" element={<AdminHome />} />
           <Route path="productos" element={<AdminProductos />} />
+          <Route path="nuevo-producto" element={<NuevoProducto />} />
           <Route path="producto" element={<Productos />} />
-          {/* Añadir más rutas hijas aquí */}
+          <Route path="usuarios" element={<AdminUsuarios />} />
+          <Route path="nuevo-usuario" element={<NuevoUsuario />} />
         </Route>
       </Routes>
     </BrowserRouter>
