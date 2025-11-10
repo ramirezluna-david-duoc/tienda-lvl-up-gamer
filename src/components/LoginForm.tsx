@@ -142,7 +142,7 @@ const LoginForm: React.FC = () => {
 
                 <div className="text-center">
                   <h5 className="mb-3">¿No estás registrado?</h5>
-                  <Link to="/register" className="btn btn-primary btn-lg">
+                  <Link to="/registro" className="btn btn-primary btn-lg">
                     Registrarme
                   </Link>
                 </div>

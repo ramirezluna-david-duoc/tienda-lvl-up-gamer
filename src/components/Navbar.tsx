@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
             ) : (
               <>
                 <Link to="/login" className="btn btn-primary text-white">Iniciar Sesión</Link>
-                <Link to="/register" className="btn btn-primary text-white">Registrarse</Link>
+                <Link to="/registro" className="btn btn-primary text-white">Registrarse</Link>/*le
               </>
             )}
           </div>
