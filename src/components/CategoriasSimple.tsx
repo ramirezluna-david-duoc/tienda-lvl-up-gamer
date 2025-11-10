@@ -1,13 +1,7 @@
 import React from 'react';
 import categoriasData from '../data/categorias.json';
 import '../styles/CategoriasSimple.css';
-
-interface Categoria {
-  id: number;
-  titulo: string;
-  imagen?: string;
-  link: string;
-}
+import { Categoria } from '../types/Categoria';
 
 // Mapa de imágenes locales confiables por título
 const imageMap: Record<string, string> = {
@@ -25,11 +19,8 @@ const CategoriasSimple: React.FC = () => {
   const categorias = categoriasData as Categoria[];
 
   const getImageFor = (titulo: string, fallbackUrl?: string): string => {
-    // Prioriza el mapa local (garantiza que Webpack sirva la imagen)
     if (imageMap[titulo]) return imageMap[titulo];
-    // Si no existe en el mapa, intenta usar la ruta del JSON (puede fallar si no es pública)
     if (fallbackUrl) return fallbackUrl;
-    // Placeholder final
     return `https://via.placeholder.com/300x200/00d9ff/ffffff?text=${encodeURIComponent(titulo)}`;
   };
 

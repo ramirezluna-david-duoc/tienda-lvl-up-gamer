@@ -2,45 +2,16 @@ import React, { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/RegisterForm.css';
 import logoEmpresa from '../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png';
+import regionComunasData from '../data/regionComunas.json';
+import { RegisterFormFields } from '../types/RegisterFormFields';
 
 const allowedDomains = ['@duoc.cl', '@profesor.duoc.cl', '@gmail.com'];
 
-const regionComunas: Record<string, string[]> = {
-  'Arica y Parinacota': ['Arica', 'Putre', 'Camarones', 'General Lagos'],
-  Tarapacá: ['Iquique', 'Alto Hospicio', 'Pozo Almonte', 'Pica'],
-  Antofagasta: ['Antofagasta', 'Calama', 'Mejillones', 'Taltal'],
-  Atacama: ['Copiapó', 'Caldera', 'Vallenar', 'Chañaral'],
-  Coquimbo: ['La Serena', 'Coquimbo', 'Ovalle', 'Illapel'],
-  'Valparaíso': ['Valparaíso', 'Viña del Mar', 'San Antonio', 'Quillota'],
-  'Metropolitana de Santiago': ['Santiago', 'Puente Alto', 'Vitacura', 'Maipú'],
-  "Libertador General Bernardo O'Higgins": ['Rancagua', 'Machalí', 'San Fernando', 'Pichilemu'],
-  Maule: ['Talca', 'Curicó', 'Linares', 'Cauquenes'],
-  'Ñuble': ['Chillán', 'Bulnes', 'Quillón', 'Yungay'],
-  'Biobío': ['Concepción', 'Talcahuano', 'Los Ángeles', 'Coronel'],
-  'La Araucanía': ['Temuco', 'Padre Las Casas', 'Angol', 'Villarrica'],
-  'Los Ríos': ['Valdivia', 'Panguipulli', 'La Unión', 'Futrono'],
-  'Los Lagos': ['Puerto Montt', 'Puerto Varas', 'Osorno', 'Castro'],
-  "Aysén del General Carlos Ibáñez del Campo": ['Coyhaique', 'Puerto Aysén', 'Chile Chico', 'Cochrane'],
-  'Magallanes y de la Antártica Chilena': ['Punta Arenas', 'Puerto Natales', 'Porvenir', 'Cabo de Hornos']
-};
+const regionComunas: Record<string, string[]> = regionComunasData;
 
-type FormFields = {
-  nombre: string;
-  apellido: string;
-  correo: string;
-  contrasena: string;
-  confirmarContrasena: string;
-  telefono: string;
-  region: string;
-  comuna: string;
-  direccion: string;
-  referido: string;
-  terminos: boolean;
-};
+type FormErrors = Partial<Record<keyof RegisterFormFields | 'general', string>>;
 
-type FormErrors = Partial<Record<keyof FormFields | 'general', string>>;
-
-const initialFields: FormFields = {
+const initialFields: RegisterFormFields = {
   nombre: '',
   apellido: '',
   correo: '',
@@ -55,7 +26,7 @@ const initialFields: FormFields = {
 };
 
 const RegisterForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormFields>(initialFields);
+  const [formData, setFormData] = useState<RegisterFormFields>(initialFields);
   const [errors, setErrors] = useState<FormErrors>({});
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -162,9 +133,9 @@ const RegisterForm: React.FC = () => {
     }
 
     setErrors({});
-    setSuccessMessage('Registro enviado correctamente (simulación)');
+    setSuccessMessage('Registro enviado correctamente.');
 
-    console.log('Datos de registro (simulación):', {
+    console.log('Datos de registro:', {
       ...formData,
       contrasena: '[oculta]',
       confirmarContrasena: undefined

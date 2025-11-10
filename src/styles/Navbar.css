@@ -41,6 +41,18 @@
   align-items: center;
 }
 
+.navbar-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.navbar-actions .btn {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  min-width: fit-content;
+}
+
 .navbar-link {
   color: #ffffff;
   text-decoration: none;

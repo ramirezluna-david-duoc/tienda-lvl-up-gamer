@@ -1,106 +1,31 @@
 import React, { ChangeEvent, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import productosData from '../data/producto.json';
 import '../styles/ProductCatalog.css';
 import { BsCart4, BsFunnelFill, BsSearch } from 'react-icons/bs';
-
-interface Producto {
-  id_producto: string;
-  categoria: string;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-}
-
-interface CatalogProduct extends Producto {
-  image: string;
-  detailLink: string;
-  categoryLabel: string;
-  price: number;
-}
-
-type ProductAsset = {
-  image: string;
-  detailLink?: string;
-  categoryLabel?: string;
-  price?: number;
-};
-
-const productAssets: Record<string, ProductAsset> = {
-  JM001: {
-    image: require('../assets/imgs/productos/Catan/D_NQ_NP_848189-MLA84841643141_052025-O_square.png'),
-    detailLink: '#',
-    categoryLabel: 'Juegos de Mesa',
-    price: 29990
-  },
-  JM002: {
-    image: require('../assets/imgs/productos/Carc/D_NQ_NP_880148-MLC89039698461_072025-O-juego-de-mesa-carcassonne-2015_square.png'),
-    detailLink: '#',
-    categoryLabel: 'Juegos de Mesa',
-    price: 24990
-  },
-  AC001: {
-    image: require('../assets/imgs/productos/Control/D_NQ_NP_2X_932200-MLA54147001786_032023-F_square.png'),
-    detailLink: '#',
-    categoryLabel: 'Accesorios',
-    price: 59990
-  },
-  AC002: {
-    image: require('../assets/imgs/productos/Auriculares/D_NQ_NP_2X_931349-MCO53148372002_012023-F_square.png'),
-    detailLink: '#',
-    categoryLabel: 'Accesorios',
-    price: 79990
-  },
-  CO001: {
-    image: require('../assets/imgs/productos/PlayStation 5/ps5_square.png'),
-    detailLink: '#',
-    categoryLabel: 'Consolas',
-    price: 549990
-  },
-  CG001: {
-    image: require('../assets/imgs/productos/PC Gamer/h7325_square.png'),
-    detailLink: '#',
-    categoryLabel: 'Computadores Gamers',
-    price: 1299990
-  },
-  SG001: {
-    image: require('../assets/imgs/productos/Silla/41UZRUxHa4L._AC_SL1000__square.png'),
-    detailLink: '#',
-    categoryLabel: 'Sillas Gamers',
-    price: 349990
-  },
-  MS001: {
-    image: require('../assets/imgs/productos/Mouse/61mpMH5TzkL._AC_SL1500__square.png'),
-    detailLink: '#',
-    categoryLabel: 'Mouse',
-    price: 49990
-  },
-  MP001: {
-    image: require('../assets/imgs/productos/MousePad/D_NQ_NP_711289-MLU70103676213_062023-O_square.png'),
-    detailLink: '#',
-    categoryLabel: 'Mousepad',
-    price: 29990
-  },
-  PP001: {
-    image: require('../assets/imgs/productos/Polera/polera_azul.png'),
-    detailLink: '#',
-    categoryLabel: 'Poleras y Polerones',
-    price: 14990
-  }
-};
+import { Producto } from '../types/Producto';
+import { CatalogProduct } from '../types/CatalogProduct';
+import { useCart } from '../context/CartContext';
 
 const rawProducts = productosData as Producto[];
 
 const fallbackImage = (nombre: string) => `https://via.placeholder.com/400x400/0a0a0a/ffffff?text=${encodeURIComponent(nombre)}`;
 
 const catalogProducts: CatalogProduct[] = rawProducts.map((producto) => {
-  const asset = productAssets[producto.id_producto] ?? {};
+  // Construir la ruta completa de la imagen usando require
+  let imageUrl: string;
+  try {
+    imageUrl = require(`../assets/imgs/${producto.imagen}`);
+  } catch {
+    imageUrl = fallbackImage(producto.nombre);
+  }
 
   return {
     ...producto,
-    image: asset.image ?? fallbackImage(producto.nombre),
-    detailLink: asset.detailLink ?? '#',
-    categoryLabel: asset.categoryLabel ?? producto.categoria,
-    price: asset.price ?? Math.max(0, Math.round(producto.precio))
+    image: imageUrl,
+    detailLink: '#',
+    categoryLabel: producto.categoria,
+    price: producto.precio
   };
 });
 
@@ -122,6 +47,7 @@ const CartIcon = BsCart4 as unknown as SvgIconComponent;
 const ProductCatalog: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES);
+  const { addItem } = useCart();
 
   const categoryOptions = useMemo(() => {
     const unique = Array.from(new Set(catalogProducts.map((product) => product.categoryLabel)));
@@ -160,10 +86,11 @@ const ProductCatalog: React.FC = () => {
   };
 
   const handleAddToCart = (product: CatalogProduct) => {
-    console.log('Agregar al carrito (simulación):', {
+    addItem({
       id: product.id_producto,
       nombre: product.nombre,
-      precio: product.price
+      precio: product.price,
+      imagen: product.image
     });
   };
 
@@ -245,10 +172,14 @@ const ProductCatalog: React.FC = () => {
                           {product.categoryLabel}
                         </div>
                         <div className="card-body d-flex flex-column">
-                          <div className="ratio ratio-1x1 mb-3 product-image-wrapper">
-                            <img src={product.image} alt={product.nombre} className="img-fluid" />
-                          </div>
-                          <h5 className="card-title text-white mb-2">{product.nombre}</h5>
+                          <Link to={`/producto/${product.id_producto}`} className="text-decoration-none">
+                            <div className="ratio ratio-1x1 mb-3 product-image-wrapper">
+                              <img src={product.image} alt={product.nombre} className="img-fluid" />
+                            </div>
+                          </Link>
+                          <Link to={`/producto/${product.id_producto}`} className="text-decoration-none">
+                            <h5 className="card-title text-white mb-2">{product.nombre}</h5>
+                          </Link>
                           <p className="card-text text-secondary small flex-grow-1">
                             {product.descripcion}
                           </p>
