@@ -6,6 +6,6 @@ export interface ProductSpecification {
 }
 
 export interface ProductDetail extends Producto {
-  imagenes?: string[]; // Array de múltiples imágenes para el carousel
+  imagenes?: string[];
   especificaciones?: ProductSpecification[];
 }

@@ -9,7 +9,6 @@ import { ProductDetail, ProductSpecification } from '../types/ProductDetail';
 
 const rawProducts = productosData as Producto[];
 
-// Mapeo de especificaciones por categoría (puedes expandir esto según necesites)
 const getSpecificationsForProduct = (product: Producto): ProductSpecification[] => {
   const specs: ProductSpecification[] = [];
 
