@@ -1,6 +1,5 @@
 -- -- -- Schema para tienda_lvl_up
 -- -- CREATE DATABASE IF NOT EXISTS tienda_lvl_up CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- -- USE tienda_lvl_up;
 
 -- -- Tabla categorias
 -- CREATE TABLE IF NOT EXISTS categorias (
@@ -21,10 +20,6 @@
 --   CONSTRAINT fk_productos_categoria FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE CASCADE ON UPDATE CASCADE
 -- ) ENGINE=InnoDB;
 
--- -- -- Índices para búsqueda
--- -- CREATE INDEX idx_productos_nombre ON productos(nombre);
--- -- CREATE INDEX idx_productos_categoria_id ON productos(categoria_id);
-
 -- -- Tabla usuarios
 -- CREATE TABLE IF NOT EXISTS usuarios (
 --   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,7 +37,3 @@
 --   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 --   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 -- ) ENGINE=InnoDB;
-
--- -- Índices usuarios
--- -- CREATE INDEX idx_usuarios_email ON usuarios(email);
--- -- CREATE INDEX idx_usuarios_username ON usuarios(username);

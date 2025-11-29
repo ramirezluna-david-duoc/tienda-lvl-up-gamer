@@ -1,9 +1,3 @@
--- -- -- RESETEO DE DATOS (ejecutar después de crear el schema)
--- -- SET FOREIGN_KEY_CHECKS = 0;
--- -- TRUNCATE TABLE productos;
--- -- TRUNCATE TABLE categorias;
--- -- SET FOREIGN_KEY_CHECKS = 1;
-
 -- -- -- CATEGORIAS (IDs determinísticos por orden de inserción)
 -- INSERT INTO categorias (titulo, imagen, link) VALUES
 -- ('Juegos de Mesa','../assets/imgs/productos/Catan/w=1500,h=1500,fit=pad_catan.webp','#'),
@@ -15,15 +9,6 @@
 -- ('Mousepads','../assets/imgs/productos/MousePad/D_NQ_NP_711289-MLU70103676213_062023-O_square.png','#'),
 -- ('Poleras y Polerones','../assets/imgs/productos/Polera/polera_azul.png','#');
 
--- -- -- PRODUCTOS (mapear categoria textual a id):
--- -- -- Juegos de Mesa -> 1
--- -- -- Accesorios -> 2
--- -- -- Consolas -> 3
--- -- -- Computadores Gamers (producto) se asociará a Computadores (id 4)
--- -- -- Sillas Gamers -> 5
--- -- -- Mouse -> 6
--- -- -- Mousepad -> Mousepads (id 7)
--- -- -- Poleras Personalizadas -> Poleras y Polerones (id 8)
 
 -- INSERT INTO productos (id_producto, categoria_id, nombre, descripcion, precio, imagen) VALUES
 -- ('JM001', 1, 'Catan', 'Un clásico juego de estrategia donde los jugadores compiten por colonizar y expandirse en la isla de Catan. Ideal para 3-4 jugadores y perfecto para noches de juego en familia o con amigos.', 29990, 'productos/Catan/D_NQ_NP_848189-MLA84841643141_052025-O_square.png'),
@@ -37,7 +22,6 @@
 -- ('MP001', 7, 'Mousepad Razer Goliathus Extended Chroma', 'Ofrece un área de juego amplia con iluminación RGB personalizable, asegurando una superficie suave y uniforme para el movimiento del mouse.', 29990, 'productos/MousePad/D_NQ_NP_711289-MLU70103676213_062023-O_square.png'),
 -- ('PP001', 8, 'Polera Gamer Personalizada "Level-Up"', 'Una camiseta cómoda y estilizada, con la posibilidad de personalizarla con tu gamer tag o diseño favorito.', 14990, 'productos/Polera/polera_azul.png');
 
--- -- -- FIN SEED
 -- -- USUARIOS (ejemplo; password "secret123" hash con bcryptjs salt 10)
 -- -- Para generar hash: const bcrypt = require('bcryptjs'); bcrypt.hashSync('secret123', 10);
 -- INSERT INTO usuarios (rut, nombre, apellido, email, fecha_nacimiento, username, region, comuna, direccion, rol, password_hash) VALUES
