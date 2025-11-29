@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import productoRoutes from './routes/productoRoutes';
 import categoriaRoutes from './routes/categoriaRoutes';
+import authRoutes from './routes/authRoutes';
 import usuarioRoutes from './routes/usuarioRoutes';
 
 const app: Application = express();
@@ -14,10 +15,11 @@ app.use(express.json());
 // Rutas principales
 app.use('/api/productos', productoRoutes);
 app.use('/api/categorias', categoriaRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 
 // Debug de rutas montadas
-console.log('[server] Rutas montadas: /api/productos, /api/categorias, /api/usuarios');
+console.log('[server] Rutas montadas: /api/productos, /api/categorias, /api/auth, /api/usuarios');
 
 
 // Ruta de salud / prueba

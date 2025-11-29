@@ -7,15 +7,18 @@ interface ApiErrorShape {
   message: string;
   status: number;
   url: string;
+  detail?: any;
 }
 
 class ApiError extends Error implements ApiErrorShape {
   status: number;
   url: string;
-  constructor(message: string, status: number, url: string) {
+  detail?: any;
+  constructor(message: string, status: number, url: string, detail?: any) {
     super(message);
     this.status = status;
     this.url = url;
+    this.detail = detail;
   }
 }
 
@@ -28,7 +31,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
     let detail: any = undefined;
     try { detail = await res.json(); } catch (_) {}
     const msg = detail?.error || detail?.message || `Error HTTP ${res.status}`;
-    throw new ApiError(msg, res.status, url);
+    throw new ApiError(msg, res.status, url, detail);
   }
   return res.json();
 }
@@ -72,6 +75,15 @@ function mapUsuario(u: any): Usuario {
 
 // API principal (nombres en español) + aliases en inglés para compatibilidad previa
 export const api = {
+  // --- Auth ---
+  login: async (identifier: string, password: string): Promise<{ user: Usuario; token: string }> => {
+    const data = await fetchJson<any>(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, password })
+    });
+    return { user: mapUsuario(data.user), token: data.token };
+  },
   // --- Productos ---
   getProductos: async (): Promise<Producto[]> => {
     const data = await fetchJson<any[]>(`${API_URL}/productos`);

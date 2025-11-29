@@ -1,9 +1,16 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard: React.FC = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate('/', { state: { loggedOut: true } });
+  };
   return (
     <div
       className="sidebar bg-dark text-white p-3"
@@ -81,12 +88,13 @@ const AdminDashboard: React.FC = () => {
           </Link>
         </li>
         <li>
-          <Link
-            to="/logout"
-            className="text-white text-decoration-none d-block py-2"
+          <button
+            onClick={handleLogout}
+            className="btn btn-outline-danger text-white d-block w-100 text-start py-2"
+            style={{ background: 'transparent' }}
           >
             Cerrar Sesión
-          </Link>
+          </button>
         </li>
       </ul>
     </div>
