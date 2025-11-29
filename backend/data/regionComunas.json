@@ -1,0 +1,19 @@
+{
+  "Arica y Parinacota": ["Arica", "Putre", "Camarones", "General Lagos"],
+  "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Pica"],
+  "Antofagasta": ["Antofagasta", "Calama", "Mejillones", "Taltal"],
+  "Atacama": ["Copiapó", "Caldera", "Vallenar", "Chañaral"],
+  "Coquimbo": ["La Serena", "Coquimbo", "Ovalle", "Illapel"],
+  "Valparaíso": ["Valparaíso", "Viña del Mar", "San Antonio", "Quillota"],
+  "Metropolitana de Santiago": ["Santiago", "Puente Alto", "Vitacura", "Maipú"],
+  "Libertador General Bernardo O'Higgins": ["Rancagua", "Machalí", "San Fernando", "Pichilemu"],
+  "Maule": ["Talca", "Curicó", "Linares", "Cauquenes"],
+  "Ñuble": ["Chillán", "Bulnes", "Quillón", "Yungay"],
+  "Biobío": ["Concepción", "Talcahuano", "Los Ángeles", "Coronel"],
+  "La Araucanía": ["Temuco", "Padre Las Casas", "Angol", "Villarrica"],
+  "Los Ríos": ["Valdivia", "Panguipulli", "La Unión", "Futrono"],
+  "Los Lagos": ["Puerto Montt", "Puerto Varas", "Osorno", "Castro"],
+  "Aysén del General Carlos Ibáñez del Campo": ["Coyhaique", "Puerto Aysén", "Chile Chico", "Cochrane"],
+  "Magallanes y de la Antártica Chilena": ["Punta Arenas", "Puerto Natales", "Porvenir", "Cabo de Hornos"]
+}
+
