@@ -22,10 +22,26 @@ const AdminDashboard: React.FC = () => {
         </li>
         <li>
           <Link
+            to="/categorias"
+            className="text-white text-decoration-none d-block py-2"
+          >
+            <i className="bi bi-tags"></i> Categorías
+          </Link>
+        </li>
+        <li>
+          <Link
             to="/usuarios"
             className="text-white text-decoration-none d-block py-2"
           >
             <i className="bi bi-people me-2"></i> Usuarios
+          </Link>
+        </li>
+        <li className="mt-2">
+          <Link
+            to="/nuevo-producto"
+            className="text-white text-decoration-none d-block py-2"
+          >
+            <i className="bi bi-plus-circle"></i> Nuevo Producto
           </Link>
         </li>
       </ul>

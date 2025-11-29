@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { v4 as uuidv4 } from "uuid";
+import { api, isApiError } from "../services/api";
 
 interface UsuarioForm {
   rut: string;
@@ -14,6 +14,7 @@ interface UsuarioForm {
   region: string;
   comuna: string;
   direccion: string;
+  password: string;
 }
 
 const NuevoUsuario: React.FC = () => {
@@ -27,6 +28,7 @@ const NuevoUsuario: React.FC = () => {
     region: "",
     comuna: "",
     direccion: "",
+    password: "",
   });
 
   const [errores, setErrores] = useState<string[]>([]);
@@ -51,7 +53,7 @@ const NuevoUsuario: React.FC = () => {
     return re.test(email);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const nuevosErrores: string[] = [];
 
@@ -68,27 +70,33 @@ const NuevoUsuario: React.FC = () => {
     if (!form.user) nuevosErrores.push("El nombre de usuario es obligatorio");
     if (!form.region) nuevosErrores.push("La región es obligatoria");
     if (!form.comuna) nuevosErrores.push("La comuna es obligatoria");
-    if (!form.direccion) nuevosErrores.push("La dirección es obligatoria");
+  if (!form.direccion) nuevosErrores.push("La dirección es obligatoria");
+  if (!form.password || form.password.length < 6) nuevosErrores.push("La contraseña debe tener al menos 6 caracteres");
 
     setErrores(nuevosErrores);
 
     if (nuevosErrores.length === 0) {
-      const usuariosGuardados = localStorage.getItem("usuarios");
-      const lista = usuariosGuardados ? JSON.parse(usuariosGuardados) : [];
-
-      // Verificar si el RUT ya existe
-      if (lista.some((u: UsuarioForm) => u.rut === form.rut)) {
-        setErrores(["Ya existe un usuario con este RUT"]);
-        return;
+      try {
+        await api.createUsuario({
+          rut: form.rut,
+          nombre: form.nombre,
+          apellido: form.apellido,
+          email: form.email,
+          fecha_nacimiento: form.fecha_nacimiento,
+          user: form.user,
+          region: form.region,
+          comuna: form.comuna,
+          direccion: form.direccion,
+          password: form.password,
+        });
+        navigate("/usuarios");
+      } catch (err) {
+        if (isApiError(err)) {
+          setErrores([`Error: ${err.message}`]);
+        } else {
+          setErrores(["Error desconocido creando usuario"]);
+        }
       }
-
-      lista.push({
-        id: uuidv4(),
-        ...form,
-      });
-
-      localStorage.setItem("usuarios", JSON.stringify(lista));
-      navigate("/usuarios");
     }
   };
 
@@ -246,6 +254,21 @@ const NuevoUsuario: React.FC = () => {
                 className="form-control"
                 placeholder="Calle, número, depto"
                 value={form.direccion}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="col-md-6">
+              <label htmlFor="password" className="form-label">
+                Contraseña*
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="form-control"
+                placeholder="Mínimo 6 caracteres"
+                value={form.password}
                 onChange={handleChange}
                 required
               />
