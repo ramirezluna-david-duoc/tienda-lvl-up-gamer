@@ -1,33 +1,68 @@
-import React, { ChangeEvent, useMemo, useState } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import productosData from '../data/producto.json';
+// import productosData from '../data/producto.json'; // Reemplazado por datos desde API
 import '../styles/ProductCatalog.css';
 import { BsCart4, BsFunnelFill, BsSearch } from 'react-icons/bs';
-import { Producto } from '../types/Producto';
+// import { Producto } from '../types/Producto'; // ya no se usa directamente
+import { api, isApiError } from '../services/api';
 import { CatalogProduct } from '../types/CatalogProduct';
 import { useCart } from '../context/CartContext';
 
-const rawProducts = productosData as Producto[];
+// const rawProducts = productosData as Producto[];
 
 const fallbackImage = (nombre: string) => `https://via.placeholder.com/400x400/0a0a0a/ffffff?text=${encodeURIComponent(nombre)}`;
 
-const catalogProducts: CatalogProduct[] = rawProducts.map((producto) => {
-  // Construir la ruta completa de la imagen usando require
-  let imageUrl: string;
+// Webpack (CRA) context para resolver imágenes sin lanzar excepciones por rutas dinámicas
+// Resolver de imagen: intenta construir una ruta estática; si falla, usa placeholder.
+const resolveImage = (imgName: string | null | undefined, nombre: string) => {
+  if (!imgName) return fallbackImage(nombre);
+  // Normalizar posibles prefijos
+  const clean = imgName.replace(/^\.\//, '').replace(/^\//, '');
   try {
-    imageUrl = require(`../assets/imgs/${producto.imagen}`);
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require(`../assets/imgs/${clean}`);
   } catch {
-    imageUrl = fallbackImage(producto.nombre);
+    return fallbackImage(nombre);
   }
+};
 
-  return {
-    ...producto,
-    image: imageUrl,
-    detailLink: '#',
-    categoryLabel: producto.categoria,
-    price: producto.precio
-  };
-});
+// Estado dinámico: productos del backend transformados a CatalogProduct
+const useCatalogProducts = () => {
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await api.getProductos();
+        if (!mounted) return;
+        const mapped = data.map((producto) => {
+          const imageUrl = resolveImage(producto.imagen, producto.nombre);
+          return {
+            ...producto,
+            image: imageUrl,
+            detailLink: `/producto/${producto.id_producto}`,
+            categoryLabel: producto.categoria,
+            price: producto.precio
+          } as CatalogProduct;
+        });
+        setProducts(mapped);
+        setError(null);
+      } catch (e: any) {
+        const msg = isApiError(e) ? e.message : 'Error cargando productos';
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  return { products, loading, error };
+};
 
 const ALL_CATEGORIES = 'todos';
 
@@ -47,28 +82,25 @@ const CartIcon = BsCart4 as unknown as SvgIconComponent;
 const ProductCatalog: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES);
+  const { products: catalogProducts, loading, error } = useCatalogProducts();
   const { addItem } = useCart();
 
   const categoryOptions = useMemo(() => {
     const unique = Array.from(new Set(catalogProducts.map((product) => product.categoryLabel)));
     return unique.sort((a, b) => a.localeCompare(b));
-  }, []);
+  }, [catalogProducts]);
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
-
     return catalogProducts.filter((product) => {
-      const matchesCategory =
-        selectedCategory === ALL_CATEGORIES || product.categoryLabel === selectedCategory;
-
+      const matchesCategory = selectedCategory === ALL_CATEGORIES || product.categoryLabel === selectedCategory;
       const matchesSearch =
         normalizedSearch.length === 0 ||
         product.nombre.toLowerCase().includes(normalizedSearch) ||
         product.descripcion.toLowerCase().includes(normalizedSearch);
-
       return matchesCategory && matchesSearch;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [searchTerm, selectedCategory, catalogProducts]);
 
   const handleApplyFilters = () => {
     console.log('Filtros aplicados (simulación):', {
@@ -159,11 +191,30 @@ const ProductCatalog: React.FC = () => {
             </div>
 
             <div className="col-12 col-lg-8 col-xxl-9">
-              {filteredProducts.length === 0 ? (
+              {loading && (
+                <div className="p-5 text-center">
+                  <div className="spinner-border text-success" role="status">
+                    <span className="visually-hidden">Cargando...</span>
+                  </div>
+                </div>
+              )}
+              {error && !loading && (
+                <div className="catalog-empty-state p-5 text-center border border-2 border-danger rounded-3">
+                  <p className="mb-2 text-danger">{error}</p>
+                  <button className="btn btn-sm btn-outline-light" onClick={() => window.location.reload()}>Reintentar</button>
+                </div>
+              )}
+              {!loading && !error && filteredProducts.length === 0 && catalogProducts.length === 0 && (
+                <div className="catalog-empty-state p-5 text-center border border-2 border-secondary rounded-3">
+                  <p className="mb-0 text-secondary">Aún no hay productos cargados.</p>
+                </div>
+              )}
+              {!loading && !error && filteredProducts.length === 0 && catalogProducts.length > 0 && (
                 <div className="catalog-empty-state p-5 text-center border border-2 border-secondary rounded-3">
                   <p className="mb-0 text-secondary">No encontramos productos que coincidan con tu búsqueda.</p>
                 </div>
-              ) : (
+              )}
+              {!loading && !error && filteredProducts.length > 0 && (
                 <div className="row g-4">
                   {filteredProducts.map((product) => (
                     <div key={product.id_producto} className="col-sm-6 col-xl-4">
