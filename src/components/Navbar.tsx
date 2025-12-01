@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
 import logoEmpresa from "../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png"
 import { useAuth } from '../context/AuthContext';
@@ -7,15 +7,31 @@ import { useCart } from '../context/CartContext';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const loggedOutFlash = (location.state as any)?.loggedOut;
+
+  useEffect(() => {
+    if (loggedOutFlash) {
+      // Limpiar el state para que al navegar no persista el mensaje
+      window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+    }
+  }, [loggedOutFlash]);
   const { totalItems } = useCart();
 
   const handleLogout = () => {
     logout();
+    navigate('/', { state: { loggedOut: true } });
   };
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
+        {loggedOutFlash && (
+          <div className="alert alert-warning w-100 mb-2" role="alert">
+            Sesión cerrada
+          </div>
+        )}
         <div className="navbar-brand">
           <img src={logoEmpresa} alt="LVL UP Gamer Logo" className="navbar-logo" />
           <span className="navbar-name">LVL UP Gamer</span>

@@ -1,9 +1,11 @@
-import React, { ChangeEvent, FormEvent, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../config/security';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/RegisterForm.css';
 import logoEmpresa from '../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png';
 import regionComunasData from '../data/regionComunas.json';
 import { RegisterFormFields } from '../types/RegisterFormFields';
+import { api, isApiError } from '../services/api';
 
 const allowedDomains = ['@duoc.cl', '@profesor.duoc.cl', '@gmail.com'];
 
@@ -12,11 +14,14 @@ const regionComunas: Record<string, string[]> = regionComunasData;
 type FormErrors = Partial<Record<keyof RegisterFormFields | 'general', string>>;
 
 const initialFields: RegisterFormFields = {
+  rut: '',
   nombre: '',
   apellido: '',
   correo: '',
+  usuario: '',
   contrasena: '',
   confirmarContrasena: '',
+  fecha_nacimiento: '',
   telefono: '',
   region: '',
   comuna: '',
@@ -29,6 +34,9 @@ const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState<RegisterFormFields>(initialFields);
   const [errors, setErrors] = useState<FormErrors>({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const intervalRef = useRef<number | null>(null);
+  const navigate = useNavigate();
 
   const comunasDisponibles = useMemo(
     () => (formData.region ? regionComunas[formData.region] ?? [] : []),
@@ -65,15 +73,26 @@ const RegisterForm: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const newErrors: FormErrors = {};
+    const trimmedRut = formData.rut.trim();
     const trimmedNombre = formData.nombre.trim();
     const trimmedApellido = formData.apellido.trim();
     const trimmedCorreo = formData.correo.trim();
+    const trimmedUsuario = formData.usuario.trim();
     const trimmedDireccion = formData.direccion.trim();
     const trimmedTelefono = formData.telefono.trim();
+
+    // Validación RUT (básica)
+    const rutLimpio = trimmedRut.replace(/[^0-9kK]/g, '');
+    if (!trimmedRut) {
+      newErrors.general = newErrors.general || '';
+      newErrors.rut = 'El RUT es obligatorio';
+    } else if (rutLimpio.length < 8) {
+      newErrors.rut = 'El RUT ingresado no es válido';
+    }
 
     if (!trimmedNombre) {
       newErrors.nombre = 'El nombre es obligatorio';
@@ -89,16 +108,24 @@ const RegisterForm: React.FC = () => {
       newErrors.correo = 'Solo se permiten correos de: @duoc.cl, @profesor.duoc.cl, @gmail.com';
     }
 
+    if (!trimmedUsuario) {
+      newErrors.usuario = 'El nombre de usuario es obligatorio';
+    }
+
     if (!formData.contrasena) {
       newErrors.contrasena = 'La contraseña es obligatoria';
-    } else if (formData.contrasena.length < 6 || formData.contrasena.length > 20) {
-      newErrors.contrasena = 'La contraseña debe tener entre 6 y 20 caracteres';
+    } else if (formData.contrasena.length < MIN_PASSWORD_LENGTH || formData.contrasena.length > MAX_PASSWORD_LENGTH) {
+      newErrors.contrasena = `La contraseña debe tener entre ${MIN_PASSWORD_LENGTH} y ${MAX_PASSWORD_LENGTH} caracteres`;
     }
 
     if (!formData.confirmarContrasena) {
       newErrors.confirmarContrasena = 'Debes confirmar tu contraseña';
     } else if (formData.confirmarContrasena !== formData.contrasena) {
       newErrors.confirmarContrasena = 'Las contraseñas no coinciden';
+    }
+
+    if (!formData.fecha_nacimiento) {
+      newErrors.fecha_nacimiento = 'La fecha de nacimiento es obligatoria';
     }
 
     if (!trimmedDireccion) {
@@ -132,15 +159,71 @@ const RegisterForm: React.FC = () => {
       return;
     }
 
-    setErrors({});
-    setSuccessMessage('Registro enviado correctamente.');
+  setErrors({});
+  setSuccessMessage('');
+  setSubmitting(true);
 
-    console.log('Datos de registro:', {
-      ...formData,
-      contrasena: '[oculta]',
-      confirmarContrasena: undefined
-    });
+    try {
+      await api.createUsuario({
+        rut: trimmedRut,
+        nombre: trimmedNombre,
+        apellido: trimmedApellido,
+        email: trimmedCorreo,
+        fecha_nacimiento: formData.fecha_nacimiento,
+        user: trimmedUsuario,
+        region: formData.region,
+        comuna: formData.comuna,
+        direccion: trimmedDireccion,
+        password: formData.contrasena,
+        rol: 'user'
+      });
+      // Mostrar mensaje con cuenta regresiva antes de redirigir
+      let seconds = 3;
+      setSuccessMessage(`Registro exitoso. Te redirigiremos al login en ${seconds} segundos...`);
+      intervalRef.current = window.setInterval(() => {
+        seconds -= 1;
+        if (seconds > 0) {
+          setSuccessMessage(`Registro exitoso. Te redirigiremos al login en ${seconds} segundo${seconds !== 1 ? 's' : ''}...`);
+        } else {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          navigate('/login', { state: { registered: true } });
+        }
+      }, 1000);
+    } catch (err) {
+      if (isApiError(err)) {
+        if (err.status === 409) {
+          const fields: string[] = Array.isArray(err.detail?.fields) ? err.detail.fields : [];
+          const labels: string[] = [];
+          if (fields.includes('rut')) labels.push('RUT');
+          if (fields.includes('email')) labels.push('correo');
+          if (fields.includes('user') || fields.includes('username')) labels.push('nombre de usuario');
+          const readable = labels.length
+            ? `Ya existe un usuario con ${labels.join(', ')} ya registrado. Por favor utiliza datos diferentes.`
+            : 'Este usuario ya existe. Revisa tu RUT, correo o nombre de usuario.';
+          setErrors({ general: readable });
+        } else {
+          setErrors({ general: err.message });
+        }
+      } else {
+        setErrors({ general: 'Error registrando usuario. Intenta nuevamente.' });
+      }
+      setSuccessMessage('');
+      setSubmitting(false);
+    }
   };
+
+  // Limpieza del intervalo al desmontar el componente
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <section className="register-section bg-dark text-white py-5 d-flex align-items-center">
@@ -168,6 +251,25 @@ const RegisterForm: React.FC = () => {
               <form id="form-registro" autoComplete="off" onSubmit={handleSubmit}>
                 <div className="row g-4">
                   <div className="col-12 col-lg-6">
+                    <div className="mb-3">
+                      <label htmlFor="rut" className="form-label">RUT</label>
+                      <input
+                        id="rut"
+                        name="rut"
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="12.345.678-9"
+                        maxLength={20}
+                        value={formData.rut}
+                        onChange={handleChange}
+                        required
+                      />
+                      {errors.rut && (
+                        <div className="alert alert-danger mt-2 mb-0" role="alert">
+                          {errors.rut}
+                        </div>
+                      )}
+                    </div>
                     <div className="mb-3">
                       <label htmlFor="nombre" className="form-label">Nombre</label>
                       <input
@@ -232,6 +334,25 @@ const RegisterForm: React.FC = () => {
                     </div>
 
                     <div className="mb-3">
+                      <label htmlFor="usuario" className="form-label">Nombre de Usuario</label>
+                      <input
+                        id="usuario"
+                        name="usuario"
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="Nombre de usuario"
+                        maxLength={50}
+                        value={formData.usuario}
+                        onChange={handleChange}
+                        required
+                      />
+                      {errors.usuario && (
+                        <div className="alert alert-danger mt-2 mb-0" role="alert">
+                          {errors.usuario}
+                        </div>
+                      )}
+                    </div>
+                    <div className="mb-3">
                       <label htmlFor="contrasena" className="form-label">Contraseña</label>
                       <input
                         id="contrasena"
@@ -287,10 +408,26 @@ const RegisterForm: React.FC = () => {
                           {errors.telefono}
                         </div>
                       )}
-                    </div>
-                  </div>
+                    </div>             </div>
 
                   <div className="col-12 col-lg-6">
+                    <div className="mb-3">
+                      <label htmlFor="fecha_nacimiento" className="form-label">Fecha de Nacimiento</label>
+                      <input
+                        id="fecha_nacimiento"
+                        name="fecha_nacimiento"
+                        type="date"
+                        className="form-control bg-dark text-white border-secondary"
+                        value={formData.fecha_nacimiento}
+                        onChange={handleChange}
+                        required
+                      />
+                      {errors.fecha_nacimiento && (
+                        <div className="alert alert-danger mt-2 mb-0" role="alert">
+                          {errors.fecha_nacimiento}
+                        </div>
+                      )}
+                    </div>
                     <div className="mb-3">
                       <label htmlFor="region" className="form-label">Región</label>
                       <select
@@ -407,8 +544,12 @@ const RegisterForm: React.FC = () => {
                 </div>
 
                 <div className="text-center mt-4">
-                  <button type="submit" className="btn btn-custom-verde px-5 py-2">
-                    Confirmar Registro
+                  <button
+                    type="submit"
+                    className="btn btn-custom-verde px-5 py-2"
+                    disabled={submitting}
+                  >
+                    {submitting ? 'Procesando...' : 'Confirmar Registro'}
                   </button>
                   <div className="mt-3">
                     <Link to="/" className="text-white text-decoration-underline">

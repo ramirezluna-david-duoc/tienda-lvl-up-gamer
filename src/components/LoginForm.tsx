@@ -1,4 +1,5 @@
 import React, { FormEvent, useState } from 'react';
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../config/security';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/LoginForm.css';
 import logoEmpresa from '../assets/imgs/ChatGPT Image 29 ago 2025, 20_49_53.png';
@@ -20,7 +21,7 @@ const LoginForm: React.FC = () => {
     return allowedDomains.some((domain) => normalized.endsWith(domain));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedEmail = email.trim();
@@ -43,8 +44,8 @@ const LoginForm: React.FC = () => {
     if (!trimmedPassword) {
       setPasswordError('La contraseña es requerida');
       isValid = false;
-    } else if (trimmedPassword.length < 4 || trimmedPassword.length > 10) {
-      setPasswordError('La contraseña debe tener entre 4 y 10 caracteres');
+    } else if (trimmedPassword.length < MIN_PASSWORD_LENGTH || trimmedPassword.length > MAX_PASSWORD_LENGTH) {
+      setPasswordError(`La contraseña debe tener entre ${MIN_PASSWORD_LENGTH} y ${MAX_PASSWORD_LENGTH} caracteres`);
       isValid = false;
     }
 
@@ -53,9 +54,8 @@ const LoginForm: React.FC = () => {
       return;
     }
 
-    // Intentar iniciar sesión
-    const loginResult = login(trimmedEmail, trimmedPassword);
-    
+    // Intentar iniciar sesión contra el backend
+    const loginResult = await login(trimmedEmail, trimmedPassword);
     if (loginResult.success) {
       // Redirigir según el rol del usuario
       if (loginResult.role === 'admin') {
@@ -64,7 +64,7 @@ const LoginForm: React.FC = () => {
         navigate('/');
       }
     } else {
-      setGeneralError('Credenciales incorrectas. Intenta con: user@duoc.cl / user123 o admin@duoc.cl / admin123');
+      setGeneralError(loginResult.message || 'Credenciales incorrectas');
     }
   };
 
@@ -109,7 +109,7 @@ const LoginForm: React.FC = () => {
                     className="form-control bg-dark text-white border-secondary"
                     id="password"
                     placeholder="Contraseña"
-                    maxLength={10}
+                    maxLength={MAX_PASSWORD_LENGTH}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     required
@@ -120,7 +120,7 @@ const LoginForm: React.FC = () => {
                     </div>
                   )}
                   <small className="form-text text-secondary">
-                    Entre 4 y 10 caracteres
+                    Entre {MIN_PASSWORD_LENGTH} y {MAX_PASSWORD_LENGTH} caracteres
                   </small>
                 </div>
 

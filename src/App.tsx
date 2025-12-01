@@ -19,6 +19,10 @@ import AdminHome from "./pages/AdminHome";
 import NuevoProducto from "./pages/NuevoProducto";
 import AdminUsuarios from "./pages/AdminUsuarios";
 import NuevoUsuario from "./pages/NuevoUsuario";
+import AdminCategorias from "./pages/AdminCategorias";
+import EditarProducto from "./pages/EditarProducto";
+import EditarCategoria from "./pages/EditarCategoria";
+import EditarUsuario from "./pages/EditarUsuario";
 
 const HomePage: React.FC = () => (
   <>
@@ -50,6 +54,10 @@ const App: React.FC = () => (
             <Route path="/producto" element={<Productos />} />
             <Route path="/usuarios" element={<AdminUsuarios />} />
             <Route path="/nuevo-usuario" element={<NuevoUsuario />} />
+            <Route path="/categorias" element={<AdminCategorias />} />
+            <Route path="/editar-producto/:id" element={<EditarProducto />} />
+            <Route path="/editar-categoria/:id" element={<EditarCategoria />} />
+            <Route path="/editar-usuario/:id" element={<EditarUsuario />} />
           </Route>
         </Routes>
       </Router>

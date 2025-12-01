@@ -1,13 +1,14 @@
-import React from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProductDetailComponent from '../components/ProductDetail';
-import productosData from '../data/producto.json';
+// import productosData from '../data/producto.json'; // Reemplazado por API
 import { Producto } from '../types/Producto';
 import { ProductDetail, ProductSpecification } from '../types/ProductDetail';
+import { api, isApiError } from '../services/api';
 
-const rawProducts = productosData as Producto[];
+// const rawProducts = productosData as Producto[];
 
 const getSpecificationsForProduct = (product: Producto): ProductSpecification[] => {
   const specs: ProductSpecification[] = [];
@@ -103,46 +104,95 @@ const getSpecificationsForProduct = (product: Producto): ProductSpecification[] 
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [product, setProduct] = useState<Producto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Buscar el producto por ID
-  const product = rawProducts.find((p) => p.id_producto === id);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        if (!id) {
+          setError('ID inválido');
+          return;
+        }
+        const data = await api.getProductoById(id);
+        if (!mounted) return;
+        setProduct(data);
+        setError(null);
+      } catch (e: any) {
+        const msg = isApiError(e) ? (e.status === 404 ? 'Producto no encontrado' : e.message) : 'Error cargando producto';
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [id]);
 
-  if (!product) {
-    return <Navigate to="/catalogo" replace />;
-  }
-
-  // Crear el objeto ProductDetail con especificaciones
-  const productDetail: ProductDetail = {
-    ...product,
-    especificaciones: getSpecificationsForProduct(product)
+  const renderStatus = () => {
+    if (loading) {
+      return (
+        <section className="bg-dark text-white py-5 text-center">
+          <div className="container py-5">
+            <div className="spinner-border text-success" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+        </section>
+      );
+    }
+    if (error) {
+      return (
+        <section className="bg-dark text-white py-5 text-center">
+          <div className="container py-5">
+            <p className="text-danger mb-3">{error}</p>
+            <a href="/catalogo" className="btn btn-outline-light">Volver al catálogo</a>
+          </div>
+        </section>
+      );
+    }
+    return null;
   };
+
+  const productDetail: ProductDetail | null = product
+    ? {
+        ...product,
+        especificaciones: getSpecificationsForProduct(product)
+      }
+    : null;
 
   return (
     <>
       <Navbar />
-      
-      {/* Banner con imagen de fondo */}
-      <section 
-        className="w-100 text-white py-4" 
-        style={{ 
-          minHeight: 180,
-          background: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url("https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200") center center / cover no-repeat'
-        }}
-      >
-        <div className="container h-100 d-flex align-items-center" style={{ minHeight: 180 }}>
-          <div>
-            <h1 className="display-5 fw-bold" style={{ textShadow: '2px 2px 8px #000' }}>
-              Detalles del Producto
-            </h1>
-          </div>
-        </div>
-      </section>
-
-      {/* Contenido principal */}
-      <section className="bg-dark py-5">
-        <ProductDetailComponent product={productDetail} />
-      </section>
-
+      {renderStatus() || (
+        <>
+          {/* Banner con imagen de fondo */}
+          <section
+            className="w-100 text-white py-4"
+            style={{
+              minHeight: 180,
+              background:
+                'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url("https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200") center center / cover no-repeat'
+            }}
+          >
+            <div className="container h-100 d-flex align-items-center" style={{ minHeight: 180 }}>
+              <div>
+                <h1 className="display-5 fw-bold" style={{ textShadow: '2px 2px 8px #000' }}>
+                  Detalles del Producto
+                </h1>
+              </div>
+            </div>
+          </section>
+          {/* Contenido principal */}
+          {productDetail && (
+            <section className="bg-dark py-5">
+              <ProductDetailComponent product={productDetail} />
+            </section>
+          )}
+        </>
+      )}
       <Footer />
     </>
   );

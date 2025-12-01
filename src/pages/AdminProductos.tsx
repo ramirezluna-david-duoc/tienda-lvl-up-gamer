@@ -2,18 +2,17 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Link } from "react-router-dom";
+import { api, isApiError } from "../services/api";
 import { v4 as uuidv4 } from "uuid";
 import { Modal, Button, Toast, ToastContainer } from "react-bootstrap";
 
 interface Producto {
-  id?: string; // id único (se añadirá a datos antiguos si falta)
-  product: string;
-  product_name: string;
+  id_producto: string;
+  nombre: string;
   descripcion: string;
   precio: number;
-  stock: number;
-  critical_stock: number;
-  categoria: string;
+  imagen?: string;
+  categoria: string; // titulo de categoría
 }
 const AdminProductos: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -23,28 +22,24 @@ const AdminProductos: React.FC = () => {
   const [codigoEliminar, setCodigoEliminar] = useState("");
 
   useEffect(() => {
-    const storedProductos = localStorage.getItem("productos");
-    if (storedProductos) {
-      const parsed: Producto[] = JSON.parse(storedProductos);
-      // Normalizar: asegurar id único para cada producto
-      const normalized = parsed.map((p) => ({
-        ...p,
-        id: p.id ? p.id : uuidv4(),
-      }));
-      // Si había elementos sin id, persistir la versión normalizada
-      const hadMissing = parsed.some((p) => !p.id);
-      if (hadMissing)
-        localStorage.setItem("productos", JSON.stringify(normalized));
-      setProductos(normalized);
-    }
+    api
+      .getProductos()
+      .then(setProductos)
+      .catch((err) => {
+        console.error("Error cargando productos", err);
+      });
   }, []);
 
   const toggleEditar = () => setMostrarEditar(!mostrarEditar);
   const toggleEliminar = () => setMostrarEliminar(!mostrarEliminar);
 
-  const handleEditar = () => {
-    if (!codigoEditar) return alert("Ingrese un código válido");
-    alert(`Editar producto con código: ${codigoEditar}`);
+  const handleEditar = async () => {
+    if (!codigoEditar) {
+      alert("Ingrese un código válido");
+      return;
+    }
+    // Reutilizar el botón "Editar producto" para ir al formulario dedicado
+    window.location.href = `/editar-producto/${encodeURIComponent(codigoEditar)}`;
     setCodigoEditar("");
     setMostrarEditar(false);
   };
@@ -54,22 +49,26 @@ const AdminProductos: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  // internal deletion (no UI confirmation) -- updates localStorage and state
-  const performDeleteById = (id: string) => {
-    const storedProductos = localStorage.getItem("productos");
-    const lista: Producto[] = storedProductos
-      ? JSON.parse(storedProductos)
-      : [];
-    const nuevaLista = lista.filter((p) => p.id !== id);
-    localStorage.setItem("productos", JSON.stringify(nuevaLista));
-    setProductos(nuevaLista);
-    setToastMessage("Producto eliminado");
-    setShowToast(true);
+  // internal deletion (no UI confirmation) -- calls API and refreshes state
+  const performDeleteById = async (idProducto: string) => {
+    try {
+      await api.deleteProducto(idProducto);
+      setProductos((prev) => prev.filter((p) => p.id_producto !== idProducto));
+      setToastMessage("Producto eliminado");
+      setShowToast(true);
+    } catch (err) {
+      if (isApiError(err)) {
+        setToastMessage(`Error ${err.status}: ${err.message}`);
+      } else {
+        setToastMessage("Error eliminando producto");
+      }
+      setShowToast(true);
+    }
   };
 
   // request deletion: open modal and store id
-  const requestDeleteById = (id: string) => {
-    setIdToDelete(id);
+  const requestDeleteById = (idProducto: string) => {
+    setIdToDelete(idProducto);
     setShowConfirmModal(true);
   };
 
@@ -86,18 +85,13 @@ const AdminProductos: React.FC = () => {
   };
 
   const deleteByCode = (code: string) => {
-    const storedProductos = localStorage.getItem("productos");
-    const lista: Producto[] = storedProductos
-      ? JSON.parse(storedProductos)
-      : [];
-    const encontrado = lista.find((p) => p.product === code);
+    const encontrado = productos.find((p) => p.id_producto === code);
     if (!encontrado) {
       setToastMessage("No se encontró un producto con ese código");
       setShowToast(true);
       return;
     }
-    if (!encontrado.id) encontrado.id = uuidv4();
-    requestDeleteById(encontrado.id);
+    requestDeleteById(encontrado.id_producto);
   };
 
   const handleEliminar = () => {
@@ -180,8 +174,7 @@ const AdminProductos: React.FC = () => {
             <th>Nombre</th>
             <th>Descripción</th>
             <th>Precio</th>
-            <th>Stock</th>
-            <th>Stock Crítico</th>
+            
             <th>Categoría</th>
             <th>Acciones</th>
           </tr>
@@ -189,20 +182,16 @@ const AdminProductos: React.FC = () => {
         <tbody>
           {productos.length > 0 ? (
             productos.map((p, index) => (
-              <tr key={p.id ?? index}>
-                <td>{p.product}</td>
-                <td>{p.product_name}</td>
+              <tr key={p.id_producto ?? index}>
+                <td>{p.id_producto}</td>
+                <td>{p.nombre}</td>
                 <td>{p.descripcion}</td>
                 <td>{p.precio}</td>
-                <td>{p.stock}</td>
-                <td>{p.critical_stock}</td>
                 <td>{p.categoria}</td>
                 <td>
                   <button
                     className="btn btn-sm btn-danger"
-                    onClick={() =>
-                      p.id ? requestDeleteById(p.id) : deleteByCode(p.product)
-                    }
+                    onClick={() => requestDeleteById(p.id_producto)}
                     title="Eliminar producto"
                   >
                     <i className="bi bi-trash"></i>

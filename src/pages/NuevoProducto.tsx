@@ -1,48 +1,42 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { v4 as uuidv4 } from "uuid";
+import { api, isApiError } from "../services/api";
 
 interface ProductoForm {
-  product: string;
-  nombre_producto: string;
+  id_producto: string;
+  nombre: string;
   descripcion: string;
   precio: number | "";
-  stock: number | "";
-  critical_stock: number | "";
-  categoria: string;
-  imagen_producto: File | null;
+  categoria_id?: number;
+  categoria?: string; // titulo
+  imagen?: string;
 }
 
 const NuevoProducto: React.FC = () => {
   const [form, setForm] = useState<ProductoForm>({
-    product: "",
-    nombre_producto: "",
+    id_producto: "",
+    nombre: "",
     descripcion: "",
     precio: "",
-    stock: "",
-    critical_stock: "",
+    categoria_id: undefined,
     categoria: "",
-    imagen_producto: null,
+    imagen: "",
   });
   const [errores, setErrores] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<{ id: number; titulo: string }[]>([]);
   const navigate = useNavigate();
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  useEffect(() => {
+    api.getCategorias()
+      .then((cats) => setCategorias(cats.map(c => ({ id: c.id, titulo: c.titulo }))))
+      .catch((err) => console.error('Error cargando categorías', err));
+  }, []);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target as HTMLInputElement;
     const { name, type } = target;
-
-    if (type === "file") {
-      const files = (target as HTMLInputElement).files;
-      setForm((prev) => ({
-        ...prev,
-        [name]: files && files[0] ? files[0] : null,
-      }));
-      return;
-    }
 
     if (type === "number") {
       const value = target.value === "" ? "" : Number(target.value);
@@ -56,33 +50,34 @@ const NuevoProducto: React.FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const nuevosErrores: string[] = [];
-    if (!form.product) nuevosErrores.push("El código es obligatorio");
-    if (!form.nombre_producto) nuevosErrores.push("El nombre es obligatorio");
+    if (!form.id_producto) nuevosErrores.push("El código es obligatorio");
+    if (!form.nombre) nuevosErrores.push("El nombre es obligatorio");
     if (
       form.precio === "" ||
       (typeof form.precio === "number" && form.precio < 0)
     )
       nuevosErrores.push("Precio inválido");
-    if (form.stock === "" || (typeof form.stock === "number" && form.stock < 0))
-      nuevosErrores.push("Stock inválido");
-    if (!form.categoria) nuevosErrores.push("Seleccione una categoría");
+    if (!form.categoria_id && !form.categoria) nuevosErrores.push("Seleccione una categoría");
     setErrores(nuevosErrores);
     if (nuevosErrores.length === 0) {
-      // Guardado simulado: puedes adaptarlo a localStorage o API
-      const productosGuardados = localStorage.getItem("productos");
-      const lista = productosGuardados ? JSON.parse(productosGuardados) : [];
-      lista.push({
-        id: uuidv4(),
-        product: form.product,
-        product_name: form.nombre_producto,
+      const payload = {
+        id_producto: form.id_producto,
+        nombre: form.nombre,
         descripcion: form.descripcion,
         precio: form.precio === "" ? 0 : form.precio,
-        stock: form.stock === "" ? 0 : form.stock,
-        critical_stock: form.critical_stock === "" ? 0 : form.critical_stock,
+        categoria_id: form.categoria_id,
         categoria: form.categoria,
-      });
-      localStorage.setItem("productos", JSON.stringify(lista));
-      navigate("/productos");
+        imagen: form.imagen || undefined
+      };
+      api.createProducto(payload)
+        .then(() => navigate("/productos"))
+        .catch((err) => {
+          if (isApiError(err)) {
+            setErrores([`Error ${err.status}: ${err.message}`]);
+          } else {
+            setErrores(["Error creando el producto"]);
+          }
+        });
     }
   };
 
@@ -96,26 +91,26 @@ const NuevoProducto: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
-          <label htmlFor="product">Código del producto*</label>
+          <label htmlFor="id_producto">Código del producto*</label>
           <input
             type="text"
-            id="product"
-            name="product"
+            id="id_producto"
+            name="id_producto"
             className="form-control mb-2"
             placeholder="Ingrese el código del producto"
-            value={form.product}
+            value={form.id_producto}
             onChange={handleChange}
             required
           />
 
-          <label htmlFor="nombre_producto">Nombre del producto*</label>
+          <label htmlFor="nombre">Nombre del producto*</label>
           <input
             type="text"
-            id="nombre_producto"
-            name="nombre_producto"
+            id="nombre"
+            name="nombre"
             className="form-control mb-2"
             placeholder="Ingrese el nombre del producto"
-            value={form.nombre_producto}
+            value={form.nombre}
             onChange={handleChange}
             required
           />
@@ -145,59 +140,31 @@ const NuevoProducto: React.FC = () => {
             required
           />
 
-          <label htmlFor="stock">Stock*</label>
-          <input
-            type="number"
-            id="stock"
-            name="stock"
-            className="form-control mb-2"
-            placeholder="Ingrese la cantidad del producto"
-            min={0}
-            step={1}
-            value={form.stock}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="critical_stock">Stock Crítico</label>
-          <input
-            type="number"
-            id="critical_stock"
-            name="critical_stock"
-            className="form-control mb-2"
-            placeholder="Stock crítico"
-            min={0}
-            step={1}
-            value={form.critical_stock}
-            onChange={handleChange}
-          />
+          {/* Campos de stock eliminados en esta versión: manejar stock en otra tabla o en tareas futuras */}
 
           <label htmlFor="categoria">Categoría</label>
           <select
             id="categoria"
-            name="categoria"
+            name="categoria_id"
             className="form-control mb-2"
-            value={form.categoria}
+            value={form.categoria_id ?? ""}
             onChange={handleChange}
             required
           >
             <option value="">-- Seleccione una categoría --</option>
-            <option value="accesorios">Accesorios</option>
-            <option value="consolas">Consolas</option>
-            <option value="computadores">Computadores</option>
-            <option value="sillas">Sillas Gamers</option>
-            <option value="mouse">Mouse</option>
-            <option value="mousepad">Mousepads</option>
-            <option value="poleras">Poleras y polerones</option>
+            {categorias.map(c => (
+              <option key={c.id} value={c.id}>{c.titulo}</option>
+            ))}
           </select>
 
-          <label htmlFor="imagen_producto">Imagen del producto</label>
+          <label htmlFor="imagen">URL de imagen (opcional)</label>
           <input
-            type="file"
-            id="imagen_producto"
-            name="imagen_producto"
+            type="text"
+            id="imagen"
+            name="imagen"
             className="form-control mb-2"
-            accept="image/*"
+            placeholder="ruta/archivo.png"
+            value={form.imagen}
             onChange={handleChange}
           />
 
